@@ -11,7 +11,7 @@ import uuid
 from io import BytesIO
 from typing import Any
 
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
 from pydantic_ai.ag_ui import StateDeps
@@ -64,9 +64,11 @@ async def upload_document(file: UploadFile = File(...)) -> dict[str, Any]:
 
     # Parse recipe using pydantic-ai
     recipe = await parse_recipe_from_text(text)
-    # # Include parsed recipe if available
-    # if not recipe:
-    #     raise Exception()
+    if not recipe:
+        raise HTTPException(
+            status_code=400,
+            detail="We could not upload that document. Please try again.",
+        )
 
     # Build response - frontend stores this in state
     response: dict[str, Any] = {
