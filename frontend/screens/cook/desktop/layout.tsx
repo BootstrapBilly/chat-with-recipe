@@ -33,16 +33,16 @@ export function DesktopLayout() {
   }
 
   return (
-    <div className="grid h-screen grid-cols-[320px_minmax(0,1fr)_360px] bg-background">
+    <div className="grid h-screen overflow-hidden grid-cols-[320px_minmax(0,1fr)_360px] bg-background">
       <IngredientsPanel />
 
-      <div className="flex h-full flex-col">
+      <div className="flex h-full flex-col min-h-0">
         <RecipeHeader recipe={recipe} variant="desktop" />
 
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 min-h-0 overflow-hidden">
           <CopilotChat
             key={threadId ?? "no-thread"}
-            className="h-full"
+            className="h-full overflow-y-auto"
             labels={{
               initial: `Ask me anything about "${recipe.title}"`,
             }}
@@ -50,7 +50,7 @@ export function DesktopLayout() {
         </div>
       </div>
 
-      <aside className="flex h-full flex-col border-l border-border bg-background">
+      <aside className="flex h-screen flex-col border-l border-border bg-background sticky top-0">
         <div className="px-6 py-5 border-b border-border">
           <h2 className="text-lg font-semibold">Steps</h2>
           <p className="text-sm text-muted-foreground mt-1">
