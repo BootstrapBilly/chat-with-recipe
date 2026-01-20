@@ -8,13 +8,14 @@ import {
 } from "@copilotkit/react-core";
 import { useUploadRecipe } from "@/hooks/use-upload-recipe";
 import { UploadScreen } from "@/screens/upload-screen/upload-screen";
-import { RecipeSidebar } from "@/screens/recipe-chat/sidebar";
-import { RecipeChat } from "@/screens/recipe-chat/chat";
+import { MobileLayout } from "@/screens/cook/mobile/layout";
 import { EMPTY_RECIPE_CONTEXT } from "@/fixtures/recipe-context";
 import type { RecipeContext } from "@/types/recipe";
 
 export default function Home() {
-  const [recipeContext, setRecipeContext] = useState<RecipeContext | null>(null);
+  const [recipeContext, setRecipeContext] = useState<RecipeContext | null>(
+    null,
+  );
   const [threadId, setLocalThreadId] = useState<string | null>(null);
   const upload = useUploadRecipe();
   const { setThreadId } = useCopilotContext();
@@ -43,6 +44,15 @@ export default function Home() {
     });
   }
 
+  function handleNextStep() {
+    setRecipeContext((prev) => {
+      if (!prev || !prev.recipe) return prev;
+      const nextStep = prev.current_step + 1;
+      if (nextStep > prev.recipe.steps.length) return prev;
+      return { ...prev, current_step: nextStep };
+    });
+  }
+
   const recipe = recipeContext?.recipe;
   const error = upload.error?.message || null;
 
@@ -57,9 +67,11 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-screen">
-      <RecipeSidebar recipe={recipe} />
-      <RecipeChat threadId={threadId} recipeTitle={recipe.title} />
-    </div>
+    <MobileLayout
+      recipe={recipe}
+      currentStep={recipeContext?.current_step ?? 0}
+      threadId={threadId}
+      onNextStep={handleNextStep}
+    />
   );
 }
