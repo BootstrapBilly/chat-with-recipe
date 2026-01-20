@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ScaleServings } from "./scale-servings";
+import { useRecipe } from "@/hooks/use-recipe";
 
 const appendMessage = vi.fn();
 
@@ -12,20 +13,29 @@ vi.mock("@copilotkit/react-core", () => ({
   }),
 }));
 
+vi.mock("@/hooks/use-recipe", () => ({
+  useRecipe: vi.fn(),
+}));
+
+const useRecipeMock = vi.mocked(useRecipe);
+
 describe("ScaleServings", () => {
   beforeEach(() => {
     appendMessage.mockClear();
+    useRecipeMock.mockReset();
   });
 
   it("renders the servings button", () => {
-    render(<ScaleServings servings={2} />);
+    useRecipeMock.mockReturnValue({ recipe: { servings: 2 } } as any);
+    render(<ScaleServings />);
 
     expect(screen.getByRole("button", { name: "2" })).toBeInTheDocument();
   });
 
   it("opens the dialog and shows current servings", async () => {
     const user = userEvent.setup();
-    render(<ScaleServings servings={3} />);
+    useRecipeMock.mockReturnValue({ recipe: { servings: 3 } } as any);
+    render(<ScaleServings />);
 
     await user.click(screen.getByRole("button", { name: "3" }));
 
@@ -37,7 +47,8 @@ describe("ScaleServings", () => {
 
   it("increments and decrements with a min of 1", async () => {
     const user = userEvent.setup();
-    render(<ScaleServings servings={1} />);
+    useRecipeMock.mockReturnValue({ recipe: { servings: 1 } } as any);
+    render(<ScaleServings />);
 
     await user.click(screen.getByRole("button", { name: "1" }));
 
@@ -57,7 +68,8 @@ describe("ScaleServings", () => {
 
   it("sends a scale message when submitting a new value", async () => {
     const user = userEvent.setup();
-    render(<ScaleServings servings={2} />);
+    useRecipeMock.mockReturnValue({ recipe: { servings: 2 } } as any);
+    render(<ScaleServings />);
 
     await user.click(screen.getByRole("button", { name: "2" }));
 

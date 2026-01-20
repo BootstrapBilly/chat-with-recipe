@@ -10,12 +10,11 @@ import {
   groupIngredientsByCategory,
 } from "./ingredients-utils";
 import type { Ingredient, IngredientCategory } from "@/types/recipe";
+import { useRecipe } from "@/hooks/use-recipe";
 
-interface IngredientsListProps {
-  ingredients: Ingredient[];
-}
-
-export function IngredientsList({ ingredients }: IngredientsListProps) {
+export function IngredientsList() {
+  const { recipe } = useRecipe();
+  const ingredients = recipe?.ingredients ?? [];
   const { appendMessage, isLoading } = useCopilotChat();
   const [selectedIngredient, setSelectedIngredient] =
     useState<Ingredient | null>(null);

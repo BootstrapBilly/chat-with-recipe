@@ -13,13 +13,13 @@ import {
   DialogTitle,
 } from "@/components/generated/dialog";
 import { Input } from "@/components/generated/input";
+import { useRecipe } from "@/hooks/use-recipe";
 
-interface ScaleServingsProps {
-  servings: number;
-}
-
-export function ScaleServings({ servings }: ScaleServingsProps) {
+export function ScaleServings() {
+  const { recipe } = useRecipe();
+  if (!recipe) return null;
   const { appendMessage, isLoading } = useCopilotChat();
+  const servings = recipe?.servings ?? 0;
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(String(servings));
 
@@ -63,6 +63,7 @@ export function ScaleServings({ servings }: ScaleServingsProps) {
         variant="outline"
         className="h-12 px-3 gap-1.5"
         onClick={() => handleOpenChange(true)}
+        disabled={!servings}
       >
         <Users className="h-5 w-5" />
         <span className="text-sm font-medium">{servings}</span>

@@ -7,21 +7,12 @@ import {
   AlertTitle,
 } from "@/components/generated/alert";
 import { IngredientsList } from "../components/ingredients-list";
-import type { Ingredient } from "@/types/recipe";
 import { ScaleServings } from "../components/scale-servings";
-import { useIsSingleColumnLayout } from "@/hooks/use-is-single-column-layout";
+import { useRecipe } from "@/hooks/use-recipe";
 
-interface IngredientsPanelProps {
-  ingredients: Ingredient[];
-  servings: number;
-}
-
-export function IngredientsPanel({
-  ingredients,
-  servings,
-}: IngredientsPanelProps) {
-  const isSingleColumn = useIsSingleColumnLayout();
-  const actionCopy = isSingleColumn ? "Tap" : "Click";
+export function IngredientsPanel() {
+  const { recipe } = useRecipe();
+  const ingredients = recipe?.ingredients ?? [];
   return (
     <div className="flex h-full flex-col border-r border-border bg-background">
       <div className="px-6 py-5 border-b border-border">
@@ -32,16 +23,16 @@ export function IngredientsPanel({
         <Alert className="mt-4 border-blue-200 bg-blue-50 text-blue-900">
           <Info className="text-blue-500" />
           <AlertTitle>Quick swap</AlertTitle>
-          <AlertDescription>{actionCopy} any ingredient to swap it.</AlertDescription>
+          <AlertDescription>Click any ingredient to swap it.</AlertDescription>
         </Alert>
       </div>
 
       <div className="flex-1 overflow-auto px-6 py-6">
-        <IngredientsList ingredients={ingredients} />
+        <IngredientsList />
       </div>
 
       <div className="border-t border-border p-4">
-        <ScaleServings servings={servings} />
+        <ScaleServings />
       </div>
     </div>
   );

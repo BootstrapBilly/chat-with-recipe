@@ -13,23 +13,31 @@ import { RecipeHeader } from "../components/recipe-header";
 import { Ingredients } from "./ingredients";
 import { ScaleServings } from "../components/scale-servings";
 import { StepCard } from "../components/step-card";
-import type { Recipe } from "@/types/recipe";
+import { UploadScreen } from "@/screens/upload-screen/upload-screen";
+import { useRecipe } from "@/hooks/use-recipe";
 
-interface Props {
-  recipe: Recipe;
-  currentStep: number;
-  threadId: string | null;
-  onNextStep: () => void;
-}
+export function MobileLayout() {
+  const {
+    recipe,
+    currentStep,
+    totalSteps,
+    isComplete,
+    threadId,
+    onNextStep,
+    onFileSelect,
+    isUploading,
+    error,
+  } = useRecipe();
 
-export function MobileLayout({
-  recipe,
-  currentStep,
-  threadId,
-  onNextStep,
-}: Props) {
-  const totalSteps = recipe.steps.length;
-  const isComplete = currentStep >= totalSteps;
+  if (!recipe) {
+    return (
+      <UploadScreen
+        onFileSelect={onFileSelect}
+        isUploading={isUploading}
+        error={error}
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -52,8 +60,8 @@ export function MobileLayout({
       {/* Bottom Bar */}
       <div className="flex items-center justify-between p-4 border-t border-border bg-background">
         <div className="flex items-center gap-2">
-          <ScaleServings servings={recipe.servings} />
-          <Ingredients ingredients={recipe.ingredients} />
+          <ScaleServings />
+          <Ingredients />
         </div>
         <Button
           onClick={onNextStep}

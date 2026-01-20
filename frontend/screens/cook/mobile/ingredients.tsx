@@ -16,17 +16,12 @@ import {
   SheetTrigger,
 } from "@/components/generated/sheet";
 import { IngredientsList } from "../components/ingredients-list";
-import { useIsSingleColumnLayout } from "@/hooks/use-is-single-column-layout";
-import type { Ingredient } from "@/types/recipe";
+import { useRecipe } from "@/hooks/use-recipe";
 
-interface IngredientsProps {
-  ingredients: Ingredient[];
-}
-
-export function Ingredients({ ingredients }: IngredientsProps) {
+export function Ingredients() {
   const [isOpen, setIsOpen] = useState(false);
-  const isSingleColumn = useIsSingleColumnLayout();
-  const actionCopy = isSingleColumn ? "Tap" : "Click";
+  const { recipe } = useRecipe();
+  const ingredients = recipe?.ingredients ?? [];
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -47,11 +42,11 @@ export function Ingredients({ ingredients }: IngredientsProps) {
           <Alert className="mt-4 border-blue-200 bg-blue-50 text-blue-900">
             <Info className="text-blue-500" />
             <AlertTitle>Quick swap</AlertTitle>
-            <AlertDescription>{actionCopy} any ingredient to swap it.</AlertDescription>
+            <AlertDescription>Tap any ingredient to swap it.</AlertDescription>
           </Alert>
         </div>
         <div className="overflow-auto h-[calc(100%-5rem)] px-6 pb-8">
-          <IngredientsList ingredients={ingredients} />
+          <IngredientsList />
         </div>
       </SheetContent>
     </Sheet>
