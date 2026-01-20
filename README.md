@@ -1,3 +1,9 @@
+# Project Docs
+- [Features](docs/features.md)
+- [Running the frontend](frontend/README.md)
+- [Frontend decisions](docs/frontend-decisions.md)
+- [Improvements](docs/improvements.md)
+
 # 🍳 Recipe Companion Challenge
 
 Build a **cooking companion** frontend that helps users extract recipes from documents 
@@ -113,8 +119,3 @@ If you have questions about the requirements, reach out at tolo.palmer@indegene.
 ---
 
 Good luck, and happy cooking!
-# Project Docs
-- [Features](docs/features.md)
-- [Running the frontend](frontend/README.md)
-- [Frontend decisions](docs/frontend-decisions.md)
-- [Improvements](docs/improvements.md)
