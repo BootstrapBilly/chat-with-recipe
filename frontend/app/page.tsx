@@ -7,9 +7,9 @@ import {
   useCopilotReadable,
 } from "@copilotkit/react-core";
 import { useUploadRecipe } from "@/hooks/use-upload-recipe";
-import { UploadScreen } from "@/pages/upload-screen/upload-screen";
-import { RecipeSidebar } from "@/pages/recipe-chat/sidebar";
-import { RecipeChat } from "@/pages/recipe-chat/chat";
+import { UploadScreen } from "@/screens/upload-screen/upload-screen";
+import { RecipeSidebar } from "@/screens/recipe-chat/sidebar";
+import { RecipeChat } from "@/screens/recipe-chat/chat";
 import { EMPTY_RECIPE_CONTEXT } from "@/fixtures/recipe-context";
 import type { RecipeContext } from "@/types/recipe";
 
