@@ -27,4 +27,23 @@ describe("Header", () => {
 
     expect(screen.getByText("medium")).toBeInTheDocument();
   });
+
+  it("renders Unknown fallbacks", () => {
+    render(
+      <Header
+        recipe={{
+          ...baseRecipe,
+          prep_time_minutes: null,
+          cook_time_minutes: null,
+          difficulty: null as never,
+        }}
+        currentStep={0}
+        totalSteps={5}
+      />,
+    );
+
+    expect(screen.getByText("Unknown prep")).toBeInTheDocument();
+    expect(screen.getByText("Unknown cook")).toBeInTheDocument();
+    expect(screen.getByText("Unknown")).toBeInTheDocument();
+  });
 });
