@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageCircle, ChevronRight, Users, ListChecks } from "lucide-react";
+import { MessageCircle, ChevronRight, Users } from "lucide-react";
 import { CopilotChat } from "@copilotkit/react-ui";
 import { Button } from "@/components/generated/button";
 import {
@@ -10,10 +10,11 @@ import {
   SheetTrigger,
 } from "@/components/generated/sheet";
 import { Header } from "./header";
+import { Ingredients } from "./ingredients";
 import { StepCard } from "./step-card";
 import type { Recipe } from "@/types/recipe";
 
-interface MobileLayoutProps {
+interface Props {
   recipe: Recipe;
   currentStep: number;
   threadId: string | null;
@@ -25,7 +26,7 @@ export function MobileLayout({
   currentStep,
   threadId,
   onNextStep,
-}: MobileLayoutProps) {
+}: Props) {
   const totalSteps = recipe.steps.length;
   const isComplete = currentStep >= totalSteps;
 
@@ -58,10 +59,7 @@ export function MobileLayout({
             <Users className="h-5 w-5" />
             <span className="text-sm font-medium">{recipe.servings}</span>
           </Button>
-          <Button variant="outline" size="icon" className="h-12 w-12">
-            <ListChecks className="h-5 w-5" />
-            <span className="sr-only">Ingredients</span>
-          </Button>
+          <Ingredients ingredients={recipe.ingredients} />
         </div>
         <Button
           onClick={onNextStep}

@@ -2,22 +2,11 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MobileLayout } from "./layout";
-import { baseRecipe } from "@/fixtures/recipe";
-import { baseStep } from "@/fixtures/recipe-step";
-import type { Recipe } from "@/types/recipe";
+import { recipeWithSteps } from "@/fixtures/recipe";
 
 vi.mock("@copilotkit/react-ui", () => ({
   CopilotChat: () => <div data-testid="copilot-chat">Chat</div>,
 }));
-
-const recipeWithSteps: Recipe = {
-  ...baseRecipe,
-  title: "Pancakes",
-  steps: [
-    { ...baseStep, step_number: 1, instruction: "Mix dry ingredients" },
-    { ...baseStep, step_number: 2, instruction: "Add wet ingredients" },
-  ],
-};
 
 describe("MobileLayout", () => {
   it("renders recipe title in header", () => {
@@ -114,5 +103,37 @@ describe("MobileLayout", () => {
     );
 
     expect(screen.getByText("4")).toBeInTheDocument();
+  });
+
+  it("opens ingredients drawer when ingredients button is clicked", async () => {
+    render(
+      <MobileLayout
+        recipe={recipeWithSteps}
+        currentStep={0}
+        threadId={null}
+        onNextStep={vi.fn()}
+      />
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: /ingredients/i }));
+
+    expect(screen.getByRole("heading", { name: "Ingredients" })).toBeInTheDocument();
+  });
+
+  it("displays ingredients in drawer", async () => {
+    render(
+      <MobileLayout
+        recipe={recipeWithSteps}
+        currentStep={0}
+        threadId={null}
+        onNextStep={vi.fn()}
+      />
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: /ingredients/i }));
+
+    expect(screen.getByText("flour")).toBeInTheDocument();
+    expect(screen.getByText("2 cups")).toBeInTheDocument();
+    expect(screen.getByText(/eggs/)).toBeInTheDocument();
   });
 });
