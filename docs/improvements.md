@@ -87,3 +87,13 @@ Implementation sketch:
 Notes:
 
 - Scaling already looks deterministic in the backend via `scale_recipe`; the improvement is to ensure the UI always invokes it directly through a dedicated endpoint.
+
+## Playwright smoke test
+
+Behaviour:
+
+- Add a lightweight end-to-end smoke test to verify the app boots and the critical UI paths render.
+
+Implementation sketch:
+
+- Keep it fast: one test that covers upload → chat visible → changing steps works → swap ingredient works → scale recipe works
