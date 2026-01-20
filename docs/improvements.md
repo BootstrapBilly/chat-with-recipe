@@ -48,6 +48,8 @@ Implementation sketch:
 
 https://docs.cloud.google.com/vertex-ai/generative-ai/docs/provisioned-throughput/error-code-429
 
+gemini-2.5-flash-lite seems to be fine.
+
 Behaviour:
 
 - Reduce 429s by using a model/endpoint with higher throughput or provisioned capacity.
@@ -57,7 +59,6 @@ Implementation sketch:
 
 - Move to a higher‑throughput model or enable provisioned throughput for Vertex AI.
 - Add retry/backoff and user‑visible “busy” state when rate limits are hit.
-
 
 ## Step navigation controls
 

@@ -9,11 +9,11 @@ import {
 } from "react";
 import {
   useCoAgent,
-  useCopilotChat,
+  useCopilotChatInternal,
   useCopilotContext,
   useCopilotReadable,
 } from "@copilotkit/react-core";
-import { MessageRole, TextMessage } from "@copilotkit/runtime-client-gql";
+import { randomUUID } from "@copilotkit/shared";
 import { useUploadRecipe } from "@/hooks/use-upload-recipe";
 import { EMPTY_RECIPE_CONTEXT } from "@/fixtures/recipe-context";
 import type { Recipe, RecipeContext } from "@/types/recipe";
@@ -40,7 +40,7 @@ export function RecipeProvider({ children }: { children: React.ReactNode }) {
   const [threadId, setLocalThreadId] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const upload = useUploadRecipe();
-  const { appendMessage } = useCopilotChat();
+  const { sendMessage } = useCopilotChatInternal();
   const { setThreadId } = useCopilotContext();
 
   useCoAgent<RecipeContext>({
@@ -82,13 +82,12 @@ export function RecipeProvider({ children }: { children: React.ReactNode }) {
 
   const handleNextStep = useCallback(async () => {
     if (!recipeContext?.recipe) return;
-    await appendMessage(
-      new TextMessage({
-        role: MessageRole.User,
-        content: "Next step.",
-      }),
-    );
-  }, [appendMessage, recipeContext]);
+    await sendMessage({
+      id: randomUUID(),
+      role: "user",
+      content: "Move on to the next step",
+    });
+  }, [recipeContext, sendMessage]);
 
   const recipe = recipeContext?.recipe ?? null;
   const totalSteps = recipe?.steps.length ?? 0;

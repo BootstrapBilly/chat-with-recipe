@@ -6,7 +6,7 @@ import { recipeWithSteps } from "@/fixtures/recipe";
 import type { RecipeContext } from "@/types/recipe";
 
 const mutate = vi.fn();
-const appendMessage = vi.fn();
+const sendMessage = vi.fn();
 
 vi.mock("@/hooks/use-upload-recipe", () => ({
   useUploadRecipe: () => ({
@@ -20,9 +20,8 @@ vi.mock("@copilotkit/react-core", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@copilotkit/react-core")>();
   return {
     ...actual,
-    useCopilotChat: () => ({
-      appendMessage,
-      isLoading: false,
+    useCopilotChatInternal: () => ({
+      sendMessage,
     }),
     useCopilotContext: () => ({
       setThreadId: vi.fn(),
@@ -53,7 +52,7 @@ function RecipeProbe() {
 describe("useRecipe", () => {
   beforeEach(() => {
     mutate.mockReset();
-    appendMessage.mockReset();
+    sendMessage.mockReset();
   });
 
   it("throws if used without provider", () => {
@@ -99,6 +98,6 @@ describe("useRecipe", () => {
 
     await user.click(screen.getByRole("button", { name: /next/i }));
 
-    expect(appendMessage).toHaveBeenCalledTimes(1);
+    expect(sendMessage).toHaveBeenCalledTimes(1);
   });
 });
