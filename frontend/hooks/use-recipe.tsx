@@ -9,9 +9,11 @@ import {
 } from "react";
 import {
   useCoAgent,
+  useCopilotChat,
   useCopilotContext,
   useCopilotReadable,
 } from "@copilotkit/react-core";
+import { MessageRole, TextMessage } from "@copilotkit/runtime-client-gql";
 import { useUploadRecipe } from "@/hooks/use-upload-recipe";
 import { EMPTY_RECIPE_CONTEXT } from "@/fixtures/recipe-context";
 import type { Recipe, RecipeContext } from "@/types/recipe";
@@ -38,6 +40,7 @@ export function RecipeProvider({ children }: { children: React.ReactNode }) {
   const [threadId, setLocalThreadId] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const upload = useUploadRecipe();
+  const { appendMessage } = useCopilotChat();
   const { setThreadId } = useCopilotContext();
 
   useCoAgent<RecipeContext>({
@@ -77,26 +80,26 @@ export function RecipeProvider({ children }: { children: React.ReactNode }) {
     [setThreadId, upload],
   );
 
-  const handleNextStep = useCallback(() => {
-    setRecipeContext((prev) => {
-      if (!prev || !prev.recipe) return prev;
-      const nextStep = prev.current_step + 1;
-      if (nextStep > prev.recipe.steps.length) return prev;
-      return { ...prev, current_step: nextStep };
-    });
-  }, []);
+  const handleNextStep = useCallback(async () => {
+    if (!recipeContext?.recipe) return;
+    await appendMessage(
+      new TextMessage({
+        role: MessageRole.User,
+        content: "Next step.",
+      }),
+    );
+  }, [appendMessage, recipeContext]);
 
   const recipe = recipeContext?.recipe ?? null;
   const totalSteps = recipe?.steps.length ?? 0;
-  const isComplete = recipe
-    ? (recipeContext?.current_step ?? 0) >= totalSteps
-    : false;
+  const currentStep = (recipeContext?.current_step ?? 0) + 1;
+  const isComplete = recipe ? currentStep >= totalSteps : false;
 
   const value = useMemo<RecipeStore>(
     () => ({
       recipeContext,
       recipe,
-      currentStep: recipeContext?.current_step ?? 0,
+      currentStep,
       totalSteps,
       isComplete,
       threadId,
@@ -108,9 +111,10 @@ export function RecipeProvider({ children }: { children: React.ReactNode }) {
     [
       recipeContext,
       recipe,
-      threadId,
+      currentStep,
       totalSteps,
       isComplete,
+      threadId,
       upload.isPending,
       upload.error,
       uploadError,

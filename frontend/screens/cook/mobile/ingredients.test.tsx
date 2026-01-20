@@ -4,6 +4,8 @@ import userEvent from "@testing-library/user-event";
 import { Ingredients } from "./ingredients";
 import { mockIngredients } from "@/fixtures/ingredients";
 import { useRecipe } from "@/hooks/use-recipe";
+import type { Recipe } from "@/types/recipe";
+import { makeRecipeStore } from "@/test/mock-recipe-store";
 
 vi.mock("@/hooks/use-recipe", () => ({
   useRecipe: vi.fn(),
@@ -13,8 +15,10 @@ const useRecipeMock = vi.mocked(useRecipe);
 
 function mockRecipeState(ingredients = mockIngredients) {
   useRecipeMock.mockReturnValue({
-    recipe: { ingredients },
-  } as any);
+    ...makeRecipeStore({
+      recipe: { ingredients } as Recipe,
+    }),
+  });
 }
 
 describe("Ingredients", () => {

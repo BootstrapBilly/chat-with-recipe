@@ -73,7 +73,7 @@ export function DesktopLayout() {
             disabled={isComplete}
             className="w-full"
           >
-            {isComplete ? "Done" : currentStep === 0 ? "Start" : "Next"}
+            {isComplete ? "Finished" : "Next"}
             {!isComplete && <ChevronRight className="ml-1 h-5 w-5" />}
           </Button>
         </div>

@@ -20,7 +20,6 @@ export function MobileLayout() {
   const {
     recipe,
     currentStep,
-    totalSteps,
     isComplete,
     threadId,
     onNextStep,
@@ -68,7 +67,7 @@ export function MobileLayout() {
           disabled={isComplete}
           className="h-12 px-8"
         >
-          {isComplete ? "Done" : currentStep === 0 ? "Start" : "Next"}
+          {isComplete ? "Finished" : "Next"}
           {!isComplete && <ChevronRight className="ml-1 h-5 w-5" />}
         </Button>
       </div>

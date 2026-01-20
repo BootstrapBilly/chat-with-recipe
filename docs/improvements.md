@@ -43,3 +43,30 @@ Implementation sketch:
 
 - Backend: persist recipe metadata + thread id + last updated timestamp.
 - Frontend: fetch list on load, render a history list, and set current thread id when selecting.
+
+## Model with higher rate limits
+
+https://docs.cloud.google.com/vertex-ai/generative-ai/docs/provisioned-throughput/error-code-429
+
+Behaviour:
+
+- Reduce 429s by using a model/endpoint with higher throughput or provisioned capacity.
+- Prefer a model tier or hosting option that supports sustained chat + tool calls without throttling.
+
+Implementation sketch:
+
+- Move to a higher‑throughput model or enable provisioned throughput for Vertex AI.
+- Add retry/backoff and user‑visible “busy” state when rate limits are hit.
+
+
+## Step navigation controls
+
+Behaviour:
+
+- Allow users to go back to a previous step and reset progress.
+- Provide a quick "restart" to set step back to 1.
+
+Implementation sketch:
+
+- Backend: use `update_cooking_progress` to set explicit step indices (including decrease/reset).
+- Frontend: add back/reset controls and update the UI based on the new current step.

@@ -6,6 +6,7 @@ import { recipeWithSteps } from "@/fixtures/recipe";
 import type { RecipeContext } from "@/types/recipe";
 
 const mutate = vi.fn();
+const appendMessage = vi.fn();
 
 vi.mock("@/hooks/use-upload-recipe", () => ({
   useUploadRecipe: () => ({
@@ -14,6 +15,26 @@ vi.mock("@/hooks/use-upload-recipe", () => ({
     error: null,
   }),
 }));
+
+vi.mock("@copilotkit/react-core", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@copilotkit/react-core")>();
+  return {
+    ...actual,
+    useCopilotChat: () => ({
+      appendMessage,
+      isLoading: false,
+    }),
+    useCopilotContext: () => ({
+      setThreadId: vi.fn(),
+    }),
+    useCoAgent: () => ({
+      state: {},
+      setState: vi.fn(),
+      running: false,
+    }),
+    useCopilotReadable: () => {},
+  };
+});
 
 function RecipeProbe() {
   const { recipe, currentStep, onFileSelect, onNextStep } = useRecipe();
@@ -32,6 +53,7 @@ function RecipeProbe() {
 describe("useRecipe", () => {
   beforeEach(() => {
     mutate.mockReset();
+    appendMessage.mockReset();
   });
 
   it("throws if used without provider", () => {
@@ -42,7 +64,7 @@ describe("useRecipe", () => {
     );
   });
 
-  it("updates recipe after upload and advances steps", async () => {
+  it("updates recipe after upload and sends next step message", async () => {
     const user = userEvent.setup();
     const state: RecipeContext = {
       document_text: null,
@@ -73,10 +95,10 @@ describe("useRecipe", () => {
     await user.click(screen.getByRole("button", { name: /upload/i }));
 
     expect(screen.getByTestId("recipe-title")).toHaveTextContent("Pancakes");
-    expect(screen.getByTestId("current-step")).toHaveTextContent("0");
+    expect(screen.getByTestId("current-step")).toHaveTextContent("1");
 
     await user.click(screen.getByRole("button", { name: /next/i }));
 
-    expect(screen.getByTestId("current-step")).toHaveTextContent("1");
+    expect(appendMessage).toHaveBeenCalledTimes(1);
   });
 });

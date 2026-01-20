@@ -3,6 +3,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ScaleServings } from "./scale-servings";
 import { useRecipe } from "@/hooks/use-recipe";
+import type { Recipe } from "@/types/recipe";
+import { makeRecipeStore } from "@/test/mock-recipe-store";
 
 const appendMessage = vi.fn();
 
@@ -26,7 +28,11 @@ describe("ScaleServings", () => {
   });
 
   it("renders the servings button", () => {
-    useRecipeMock.mockReturnValue({ recipe: { servings: 2 } } as any);
+    useRecipeMock.mockReturnValue({
+      ...makeRecipeStore({
+        recipe: { servings: 2 } as Recipe,
+      }),
+    });
     render(<ScaleServings />);
 
     expect(screen.getByRole("button", { name: "2" })).toBeInTheDocument();
@@ -34,7 +40,11 @@ describe("ScaleServings", () => {
 
   it("opens the dialog and shows current servings", async () => {
     const user = userEvent.setup();
-    useRecipeMock.mockReturnValue({ recipe: { servings: 3 } } as any);
+    useRecipeMock.mockReturnValue({
+      ...makeRecipeStore({
+        recipe: { servings: 3 } as Recipe,
+      }),
+    });
     render(<ScaleServings />);
 
     await user.click(screen.getByRole("button", { name: "3" }));
@@ -47,7 +57,11 @@ describe("ScaleServings", () => {
 
   it("increments and decrements with a min of 1", async () => {
     const user = userEvent.setup();
-    useRecipeMock.mockReturnValue({ recipe: { servings: 1 } } as any);
+    useRecipeMock.mockReturnValue({
+      ...makeRecipeStore({
+        recipe: { servings: 1 } as Recipe,
+      }),
+    });
     render(<ScaleServings />);
 
     await user.click(screen.getByRole("button", { name: "1" }));
@@ -68,7 +82,11 @@ describe("ScaleServings", () => {
 
   it("sends a scale message when submitting a new value", async () => {
     const user = userEvent.setup();
-    useRecipeMock.mockReturnValue({ recipe: { servings: 2 } } as any);
+    useRecipeMock.mockReturnValue({
+      ...makeRecipeStore({
+        recipe: { servings: 2 } as Recipe,
+      }),
+    });
     render(<ScaleServings />);
 
     await user.click(screen.getByRole("button", { name: "2" }));

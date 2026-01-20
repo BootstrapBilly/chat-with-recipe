@@ -25,7 +25,8 @@ describe("UploadScreen", () => {
       />
     );
 
-    expect(screen.getByText("Upload failed")).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+    expect(screen.getAllByText("Upload failed")).toHaveLength(2);
   });
 
   it("does not display error when null", () => {

@@ -55,33 +55,28 @@ describe("MobileLayout", () => {
     expect(screen.getByText("Add wet ingredients")).toBeInTheDocument();
   });
 
-  it("shows Start button when currentStep is 0", () => {
-    mockRecipeState({ currentStep: 0, isComplete: false });
-    render(<MobileLayout />);
-
-    expect(screen.getByRole("button", { name: /start/i })).toBeInTheDocument();
-  });
-
-  it("shows Next button when cooking has started", () => {
+  it("shows Next button on first step", () => {
     mockRecipeState({ currentStep: 1, isComplete: false });
     render(<MobileLayout />);
 
     expect(screen.getByRole("button", { name: /next/i })).toBeInTheDocument();
   });
 
-  it("shows Done when recipe is complete", () => {
+  it("shows Finished when recipe is complete", () => {
     mockRecipeState({ currentStep: 2, isComplete: true });
     render(<MobileLayout />);
 
-    expect(screen.getByRole("button", { name: /done/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /finished/i }),
+    ).toBeInTheDocument();
   });
 
   it("calls onNextStep when button is clicked", async () => {
     onNextStep.mockClear();
-    mockRecipeState({ currentStep: 0, isComplete: false });
+    mockRecipeState({ currentStep: 1, isComplete: false });
     render(<MobileLayout />);
 
-    await userEvent.click(screen.getByRole("button", { name: /start/i }));
+    await userEvent.click(screen.getByRole("button", { name: /next/i }));
 
     expect(onNextStep).toHaveBeenCalledOnce();
   });

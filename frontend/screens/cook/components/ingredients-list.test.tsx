@@ -3,6 +3,8 @@ import { render, screen } from "@testing-library/react";
 import { IngredientsList } from "./ingredients-list";
 import { mockIngredients } from "@/fixtures/ingredients";
 import { useRecipe } from "@/hooks/use-recipe";
+import type { Recipe } from "@/types/recipe";
+import { makeRecipeStore } from "@/test/mock-recipe-store";
 
 vi.mock("@/hooks/use-recipe", () => ({
   useRecipe: vi.fn(),
@@ -16,8 +18,10 @@ describe("IngredientsList", () => {
   });
   it("renders grouped ingredient categories", () => {
     useRecipeMock.mockReturnValue({
-      recipe: { ingredients: mockIngredients },
-    } as any);
+      ...makeRecipeStore({
+        recipe: { ingredients: mockIngredients } as Recipe,
+      }),
+    });
     render(<IngredientsList />);
 
     expect(screen.getByText("Pantry")).toBeInTheDocument();
@@ -27,8 +31,10 @@ describe("IngredientsList", () => {
 
   it("renders ingredient names and quantities", () => {
     useRecipeMock.mockReturnValue({
-      recipe: { ingredients: mockIngredients },
-    } as any);
+      ...makeRecipeStore({
+        recipe: { ingredients: mockIngredients } as Recipe,
+      }),
+    });
     render(<IngredientsList />);
 
     expect(screen.getByText("flour")).toBeInTheDocument();

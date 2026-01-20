@@ -17,7 +17,6 @@ import { useRecipe } from "@/hooks/use-recipe";
 
 export function ScaleServings() {
   const { recipe } = useRecipe();
-  if (!recipe) return null;
   const { appendMessage, isLoading } = useCopilotChat();
   const servings = recipe?.servings ?? 0;
   const [open, setOpen] = useState(false);
@@ -42,6 +41,7 @@ export function ScaleServings() {
   }
 
   async function handleSubmit() {
+    if (!recipe) return;
     const nextServings = Math.max(1, currentValue);
     if (nextServings === servings) {
       setOpen(false);
@@ -56,6 +56,8 @@ export function ScaleServings() {
     );
     setOpen(false);
   }
+
+  if (!recipe) return null;
 
   return (
     <>
