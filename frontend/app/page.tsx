@@ -24,9 +24,20 @@ export default function Home() {
     name: "recipe_agent",
     state: recipeContext ?? EMPTY_RECIPE_CONTEXT,
     setState: (next) =>
-      setRecipeContext((prev) =>
-        typeof next === "function" ? next(prev ?? EMPTY_RECIPE_CONTEXT) : next,
-      ),
+      setRecipeContext((prev) => {
+        const resolved =
+          typeof next === "function" ? next(prev ?? EMPTY_RECIPE_CONTEXT) : next;
+        return {
+          ...resolved,
+          recipe: resolved.recipe
+            ? {
+                ...resolved.recipe,
+                ingredients: [...resolved.recipe.ingredients],
+                steps: [...resolved.recipe.steps],
+              }
+            : null,
+        };
+      }),
   });
 
   useCopilotReadable({

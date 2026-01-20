@@ -1,8 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MobileLayout } from "./layout";
 import { recipeWithSteps } from "@/fixtures/recipe";
+import { renderWithProviders } from "@/test/render-with-providers";
 
 vi.mock("@copilotkit/react-ui", () => ({
   CopilotChat: () => <div data-testid="copilot-chat">Chat</div>,
@@ -10,7 +11,7 @@ vi.mock("@copilotkit/react-ui", () => ({
 
 describe("MobileLayout", () => {
   it("renders recipe title in header", () => {
-    render(
+    renderWithProviders(
       <MobileLayout
         recipe={recipeWithSteps}
         currentStep={0}
@@ -23,7 +24,7 @@ describe("MobileLayout", () => {
   });
 
   it("renders all steps", () => {
-    render(
+    renderWithProviders(
       <MobileLayout
         recipe={recipeWithSteps}
         currentStep={0}
@@ -37,7 +38,7 @@ describe("MobileLayout", () => {
   });
 
   it("shows Start button when currentStep is 0", () => {
-    render(
+    renderWithProviders(
       <MobileLayout
         recipe={recipeWithSteps}
         currentStep={0}
@@ -50,7 +51,7 @@ describe("MobileLayout", () => {
   });
 
   it("shows Next button when cooking has started", () => {
-    render(
+    renderWithProviders(
       <MobileLayout
         recipe={recipeWithSteps}
         currentStep={1}
@@ -63,7 +64,7 @@ describe("MobileLayout", () => {
   });
 
   it("shows Done when recipe is complete", () => {
-    render(
+    renderWithProviders(
       <MobileLayout
         recipe={recipeWithSteps}
         currentStep={2}
@@ -78,7 +79,7 @@ describe("MobileLayout", () => {
   it("calls onNextStep when button is clicked", async () => {
     const onNextStep = vi.fn();
 
-    render(
+    renderWithProviders(
       <MobileLayout
         recipe={recipeWithSteps}
         currentStep={0}
@@ -93,7 +94,7 @@ describe("MobileLayout", () => {
   });
 
   it("renders servings in bottom bar", () => {
-    render(
+    renderWithProviders(
       <MobileLayout
         recipe={recipeWithSteps}
         currentStep={0}
@@ -106,7 +107,7 @@ describe("MobileLayout", () => {
   });
 
   it("opens ingredients drawer when ingredients button is clicked", async () => {
-    render(
+    renderWithProviders(
       <MobileLayout
         recipe={recipeWithSteps}
         currentStep={0}
@@ -121,7 +122,7 @@ describe("MobileLayout", () => {
   });
 
   it("displays ingredients in drawer", async () => {
-    render(
+    renderWithProviders(
       <MobileLayout
         recipe={recipeWithSteps}
         currentStep={0}

@@ -1,18 +1,19 @@
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Ingredients } from "./ingredients";
 import { mockIngredients } from "@/fixtures/ingredients";
+import { renderWithProviders } from "@/test/render-with-providers";
 
 describe("Ingredients", () => {
   it("renders ingredients button", () => {
-    render(<Ingredients ingredients={mockIngredients} />);
+    renderWithProviders(<Ingredients ingredients={mockIngredients} />);
 
     expect(screen.getByRole("button", { name: /ingredients/i })).toBeInTheDocument();
   });
 
   it("opens drawer when button is clicked", async () => {
-    render(<Ingredients ingredients={mockIngredients} />);
+    renderWithProviders(<Ingredients ingredients={mockIngredients} />);
 
     await userEvent.click(screen.getByRole("button", { name: /ingredients/i }));
 
@@ -20,7 +21,7 @@ describe("Ingredients", () => {
   });
 
   it("displays item count", async () => {
-    render(<Ingredients ingredients={mockIngredients} />);
+    renderWithProviders(<Ingredients ingredients={mockIngredients} />);
 
     await userEvent.click(screen.getByRole("button", { name: /ingredients/i }));
 
@@ -28,7 +29,7 @@ describe("Ingredients", () => {
   });
 
   it("displays ingredient names", async () => {
-    render(<Ingredients ingredients={mockIngredients} />);
+    renderWithProviders(<Ingredients ingredients={mockIngredients} />);
 
     await userEvent.click(screen.getByRole("button", { name: /ingredients/i }));
 
@@ -39,7 +40,7 @@ describe("Ingredients", () => {
   });
 
   it("displays quantities", async () => {
-    render(<Ingredients ingredients={mockIngredients} />);
+    renderWithProviders(<Ingredients ingredients={mockIngredients} />);
 
     await userEvent.click(screen.getByRole("button", { name: /ingredients/i }));
 
@@ -49,7 +50,7 @@ describe("Ingredients", () => {
   });
 
   it("displays preparation notes", async () => {
-    render(<Ingredients ingredients={mockIngredients} />);
+    renderWithProviders(<Ingredients ingredients={mockIngredients} />);
 
     await userEvent.click(screen.getByRole("button", { name: /ingredients/i }));
 
@@ -58,7 +59,7 @@ describe("Ingredients", () => {
   });
 
   it("groups ingredients by category", async () => {
-    render(<Ingredients ingredients={mockIngredients} />);
+    renderWithProviders(<Ingredients ingredients={mockIngredients} />);
 
     await userEvent.click(screen.getByRole("button", { name: /ingredients/i }));
 
@@ -68,7 +69,7 @@ describe("Ingredients", () => {
   });
 
   it("handles empty ingredients list", async () => {
-    render(<Ingredients ingredients={[]} />);
+    renderWithProviders(<Ingredients ingredients={[]} />);
 
     await userEvent.click(screen.getByRole("button", { name: /ingredients/i }));
 

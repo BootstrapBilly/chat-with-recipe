@@ -1,7 +1,15 @@
 "use client";
 
-import { ListChecks } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Info, ListChecks } from "lucide-react";
+import { useCopilotChat } from "@copilotkit/react-core";
+import { MessageRole, TextMessage } from "@copilotkit/runtime-client-gql";
 import { Button } from "@/components/generated/button";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/generated/alert";
 import {
   Sheet,
   SheetContent,
@@ -9,6 +17,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/generated/sheet";
+import { IngredientItem } from "./ingredient-item";
+import { SubstituteIngredient } from "./substitute-ingredient";
 import type { Ingredient, IngredientCategory } from "@/types/recipe";
 
 interface IngredientsProps {
@@ -34,14 +44,57 @@ const CATEGORY_LABELS: Record<IngredientCategory, string> = {
 };
 
 export function Ingredients({ ingredients }: IngredientsProps) {
+  const { appendMessage, isLoading } = useCopilotChat();
+  const [selectedIngredient, setSelectedIngredient] =
+    useState<Ingredient | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [swapValue, setSwapValue] = useState("");
+  const [swapError, setSwapError] = useState<string | null>(null);
+  const [isSwapping, setIsSwapping] = useState(false);
+
   const groupedIngredients = CATEGORY_ORDER.reduce(
     (acc, category) => {
       const items = ingredients.filter((ing) => ing.category === category);
       if (items.length > 0) acc[category] = items;
       return acc;
     },
-    {} as Record<IngredientCategory, Ingredient[]>
+    {} as Record<IngredientCategory, Ingredient[]>,
   );
+
+  function handleIngredientClick(ingredient: Ingredient) {
+    setSwapValue("");
+    setSelectedIngredient(ingredient);
+    setIsDialogOpen(true);
+  }
+
+  useEffect(() => {
+    if (isSwapping && !isLoading) {
+      setIsSwapping(false);
+      setIsDialogOpen(false);
+    }
+  }, [isLoading, isSwapping]);
+
+  async function handleSubstitute(ingredient: Ingredient, substitute: string) {
+    const content = substitute
+      ? `Substitute ${ingredient.name} with ${substitute}.`
+      : `Suggest a substitute for ${ingredient.name}.`;
+
+    setSwapError(null);
+    setIsSwapping(true);
+    try {
+      await appendMessage(
+        new TextMessage({
+          role: MessageRole.User,
+          content,
+        }),
+      );
+    } catch (error) {
+      setIsSwapping(false);
+      setSwapError(
+        error instanceof Error ? error.message : "Something went wrong",
+      );
+    }
+  }
 
   return (
     <Sheet>
@@ -59,6 +112,11 @@ export function Ingredients({ ingredients }: IngredientsProps) {
           <SheetDescription className="text-sm text-muted-foreground mt-1">
             {ingredients.length} items
           </SheetDescription>
+          <Alert className="mt-4 border-blue-200 bg-blue-50 text-blue-900">
+            <Info className="text-blue-500" />
+            <AlertTitle>Quick swap</AlertTitle>
+            <AlertDescription>Tap any ingredient to swap it.</AlertDescription>
+          </Alert>
         </div>
         <div className="overflow-auto h-[calc(100%-5rem)] px-6 pb-8">
           <div className="space-y-8">
@@ -71,22 +129,12 @@ export function Ingredients({ ingredients }: IngredientsProps) {
                   <div className="flex-1 h-px bg-border" />
                 </div>
                 <ul className="space-y-4">
-                  {items.map((ing, i) => (
-                    <li key={`${ing.name}-${i}`} className="flex justify-between items-start gap-4">
-                      <div className="flex-1 min-w-0">
-                        <span className="text-[15px] text-foreground font-medium">
-                          {ing.name}
-                        </span>
-                        {ing.preparation && (
-                          <p className="text-[13px] text-muted-foreground mt-0.5">
-                            {ing.preparation}
-                          </p>
-                        )}
-                      </div>
-                      <span className="text-[15px] text-muted-foreground tabular-nums pt-px">
-                        {[ing.quantity, ing.unit].filter(Boolean).join(" ")}
-                      </span>
-                    </li>
+                  {items.map((ingredient, i) => (
+                    <IngredientItem
+                      key={`${ingredient.name}-${i}`}
+                      ingredient={ingredient}
+                      onSelect={handleIngredientClick}
+                    />
                   ))}
                 </ul>
               </section>
@@ -94,6 +142,16 @@ export function Ingredients({ ingredients }: IngredientsProps) {
           </div>
         </div>
       </SheetContent>
+      <SubstituteIngredient
+        ingredient={selectedIngredient}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onSubmit={handleSubstitute}
+        value={swapValue}
+        onValueChange={setSwapValue}
+        isLoading={isSwapping || isLoading}
+        error={swapError}
+      />
     </Sheet>
   );
 }

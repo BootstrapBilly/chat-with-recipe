@@ -16,7 +16,7 @@ from pydantic_ai.models.google import GoogleModel
 from pydantic_ai.ag_ui import StateDeps
 from ag_ui.core import EventType, StateSnapshotEvent
 
-from .models import Recipe, RecipeContext, SubstitutionResult
+from .models import Recipe, RecipeContext, RecipeStep, SubstitutionResult
 
 # Load environment variables
 from dotenv import load_dotenv
@@ -109,6 +109,7 @@ SUBSTITUTION_PROMPT = dedent("""
 """).strip()
 
 _substitution_agent: Agent[None, SubstitutionResult] | None = None
+_step_rewrite_agent: Agent[None, list[RecipeStep]] | None = None
 
 
 def get_substitution_agent() -> Agent[None, SubstitutionResult]:
@@ -121,6 +122,18 @@ def get_substitution_agent() -> Agent[None, SubstitutionResult]:
             output_type=SubstitutionResult,
         )
     return _substitution_agent
+
+
+def get_step_rewrite_agent() -> Agent[None, list[RecipeStep]]:
+    """Get or create the step rewrite agent."""
+    global _step_rewrite_agent
+    if _step_rewrite_agent is None:
+        _step_rewrite_agent = Agent(
+            model=GoogleModel(MODEL_NAME),
+            system_prompt=STEP_REWRITE_PROMPT,
+            output_type=list[RecipeStep],
+        )
+    return _step_rewrite_agent
 
 
 async def find_and_substitute(
@@ -176,6 +189,56 @@ Find the best matching ingredient and provide substitution details.
             substitute_name=substitute_name,
             suggestion=f"Could not find '{original_ingredient}' in the recipe.",
         )
+
+
+# =============================================================================
+# Step Rewrite (LLM-based update after substitution)
+# =============================================================================
+
+STEP_REWRITE_PROMPT = dedent("""
+    You update recipe steps after an ingredient substitution.
+
+    Given the current steps and a substitution, rewrite only the steps that need
+    updating so they still make sense with the new ingredient.
+
+    Rules:
+    - Keep step numbers and ordering the same.
+    - Preserve duration_minutes, timer_label, and requires_attention unless
+      the substitution clearly changes them.
+    - Keep tips unless they become incorrect, in which case adjust them.
+    - Only change the instruction text where relevant.
+
+    Return the full list of steps in order.
+""").strip()
+
+
+async def rewrite_steps_for_substitution(
+    recipe: Recipe,
+    original_ingredient: str,
+    substitute_name: str,
+) -> list[RecipeStep]:
+    steps_text = "\n".join(
+        f"{step.step_number}. {step.instruction}" for step in recipe.steps
+    )
+
+    prompt = f"""
+Recipe title: {recipe.title}
+
+Substitution:
+- Replace: "{original_ingredient}"
+- With: "{substitute_name}"
+
+Current steps:
+{steps_text}
+"""
+
+    try:
+        agent = get_step_rewrite_agent()
+        result = await agent.run(prompt)
+        return result.output
+    except Exception as e:
+        logger.warning(f"Step rewrite failed: {e}")
+        return recipe.steps
 
 
 # =============================================================================
@@ -308,6 +371,13 @@ async def substitute_ingredient(
         result.substitute_name,
         result.substitute_quantity,
         result.substitute_unit,
+    )
+
+    # Rewrite steps to reflect the substitution
+    state.recipe.steps = await rewrite_steps_for_substitution(
+        state.recipe,
+        result.matched_ingredient,
+        result.substitute_name,
     )
 
     logger.info(
