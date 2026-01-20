@@ -1,12 +1,13 @@
 import type { Ingredient } from "@/types/recipe";
 
-export const mockIngredients: Partial<Ingredient>[] = [
+export const mockIngredients: Ingredient[] = [
   {
     name: "flour",
     quantity: 2,
     unit: "cups",
     category: "pantry",
     preparation: null,
+    substitutes: [],
   },
   {
     name: "sugar",
@@ -14,6 +15,7 @@ export const mockIngredients: Partial<Ingredient>[] = [
     unit: "cup",
     category: "pantry",
     preparation: null,
+    substitutes: [],
   },
   {
     name: "eggs",
@@ -21,6 +23,7 @@ export const mockIngredients: Partial<Ingredient>[] = [
     unit: null,
     category: "dairy",
     preparation: "beaten",
+    substitutes: [],
   },
   {
     name: "chicken",
@@ -28,5 +31,6 @@ export const mockIngredients: Partial<Ingredient>[] = [
     unit: "g",
     category: "protein",
     preparation: "diced",
+    substitutes: [],
   },
 ];
