@@ -32,8 +32,11 @@ interface RecipeStore {
 const RecipeContextValue = createContext<RecipeStore | null>(null);
 
 export function RecipeProvider({ children }: { children: React.ReactNode }) {
-  const [recipeContext, setRecipeContext] = useState<RecipeContext | null>(null);
+  const [recipeContext, setRecipeContext] = useState<RecipeContext | null>(
+    null,
+  );
   const [threadId, setLocalThreadId] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const upload = useUploadRecipe();
   const { setThreadId } = useCopilotContext();
 
@@ -43,7 +46,9 @@ export function RecipeProvider({ children }: { children: React.ReactNode }) {
     setState: (next) =>
       setRecipeContext((prev) => {
         const resolved =
-          typeof next === "function" ? next(prev ?? EMPTY_RECIPE_CONTEXT) : next;
+          typeof next === "function"
+            ? next(prev ?? EMPTY_RECIPE_CONTEXT)
+            : next;
         return resolved;
       }),
   });
@@ -57,9 +62,15 @@ export function RecipeProvider({ children }: { children: React.ReactNode }) {
     (file: File) => {
       upload.mutate(file, {
         onSuccess: (data) => {
+          setUploadError(null);
           setRecipeContext(data.state);
           setLocalThreadId(data.threadId);
           setThreadId(data.threadId);
+        },
+        onError: () => {
+          setLocalThreadId(null);
+          setRecipeContext(null);
+          setUploadError("We could not upload that document.");
         },
       });
     },
@@ -77,7 +88,9 @@ export function RecipeProvider({ children }: { children: React.ReactNode }) {
 
   const recipe = recipeContext?.recipe ?? null;
   const totalSteps = recipe?.steps.length ?? 0;
-  const isComplete = recipe ? (recipeContext?.current_step ?? 0) >= totalSteps : false;
+  const isComplete = recipe
+    ? (recipeContext?.current_step ?? 0) >= totalSteps
+    : false;
 
   const value = useMemo<RecipeStore>(
     () => ({
@@ -88,7 +101,7 @@ export function RecipeProvider({ children }: { children: React.ReactNode }) {
       isComplete,
       threadId,
       isUploading: upload.isPending,
-      error: upload.error?.message || null,
+      error: uploadError ?? (upload.error?.message || null),
       onFileSelect: handleFileSelect,
       onNextStep: handleNextStep,
     }),
@@ -100,6 +113,7 @@ export function RecipeProvider({ children }: { children: React.ReactNode }) {
       isComplete,
       upload.isPending,
       upload.error,
+      uploadError,
       handleFileSelect,
       handleNextStep,
     ],

@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CopilotKit } from "@copilotkit/react-core";
 import "@copilotkit/react-ui/styles.css";
 import "./globals.css";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 const queryClient = new QueryClient();
 
@@ -17,7 +18,7 @@ export default function RootLayout({
       <body>
         <QueryClientProvider client={queryClient}>
           <CopilotKit runtimeUrl="/api/copilotkit" agent="recipe_agent">
-            {children}
+            <ErrorBoundary>{children}</ErrorBoundary>
           </CopilotKit>
         </QueryClientProvider>
       </body>

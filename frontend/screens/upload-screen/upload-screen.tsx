@@ -1,6 +1,11 @@
 "use client";
 
 import { FileUpload } from "@/components/file-upload";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/generated/alert";
 
 interface UploadScreenProps {
   onFileSelect: (file: File) => void;
@@ -22,7 +27,10 @@ export function UploadScreen({
         </div>
         <FileUpload onFileSelect={onFileSelect} isUploading={isUploading} />
         {error ? (
-          <p className="text-sm text-destructive text-center">{error}</p>
+          <Alert className="border-destructive/30 bg-destructive/10 text-destructive">
+            <AlertTitle>Upload failed</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         ) : null}
       </div>
     </div>
