@@ -8,6 +8,11 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./vitest.setup.ts"],
     globals: true,
+    server: {
+      deps: {
+        inline: [/@copilotkit/],
+      },
+    },
   },
   resolve: {
     alias: {
