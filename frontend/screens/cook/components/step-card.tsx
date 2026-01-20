@@ -20,7 +20,7 @@ export function StepCard({ step, isActive, isComplete }: StepCardProps) {
         "rounded-lg border-2 p-4 transition-all duration-300 ease-out",
         isActive && "border-accent bg-accent/5 scale-[1.02]",
         isComplete && "border-border bg-muted/30 opacity-60",
-        !isActive && !isComplete && "border-border"
+        !isActive && !isComplete && "border-border",
       )}
     >
       <div className="flex gap-3">
@@ -29,7 +29,7 @@ export function StepCard({ step, isActive, isComplete }: StepCardProps) {
             "flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold shrink-0 transition-colors duration-300",
             isActive && "bg-accent text-white",
             isComplete && "bg-foreground text-background",
-            !isActive && !isComplete && "bg-muted text-muted-foreground"
+            !isActive && !isComplete && "bg-muted text-muted-foreground",
           )}
         >
           {step.step_number}
@@ -40,7 +40,7 @@ export function StepCard({ step, isActive, isComplete }: StepCardProps) {
             className={cn(
               "text-sm leading-relaxed transition-colors duration-300",
               isActive && "text-foreground font-medium",
-              isComplete && "text-muted-foreground"
+              isComplete && "text-muted-foreground",
             )}
           >
             {step.instruction}
@@ -52,7 +52,7 @@ export function StepCard({ step, isActive, isComplete }: StepCardProps) {
                 <span
                   className={cn(
                     "flex items-center gap-1 text-xs",
-                    isActive ? "text-accent" : "text-muted-foreground"
+                    isActive ? "text-accent" : "text-muted-foreground",
                   )}
                 >
                   <Clock className="h-3.5 w-3.5" />
@@ -76,7 +76,7 @@ export function StepCard({ step, isActive, isComplete }: StepCardProps) {
                   "flex items-center gap-1 text-xs transition-colors",
                   isActive
                     ? "text-accent hover:text-accent/80"
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 <Lightbulb className="h-3.5 w-3.5" />

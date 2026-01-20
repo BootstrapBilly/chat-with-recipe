@@ -6,9 +6,11 @@ import {
   useCopilotContext,
   useCopilotReadable,
 } from "@copilotkit/react-core";
+import { useIsSingleColumnLayout } from "@/hooks/use-is-single-column-layout";
 import { useUploadRecipe } from "@/hooks/use-upload-recipe";
 import { UploadScreen } from "@/screens/upload-screen/upload-screen";
 import { MobileLayout } from "@/screens/cook/mobile/layout";
+import { DesktopLayout } from "@/screens/cook/desktop/layout";
 import { EMPTY_RECIPE_CONTEXT } from "@/fixtures/recipe-context";
 import type { RecipeContext } from "@/types/recipe";
 
@@ -17,6 +19,7 @@ export default function Home() {
     null,
   );
   const [threadId, setLocalThreadId] = useState<string | null>(null);
+  const isSingleColumn = useIsSingleColumnLayout();
   const upload = useUploadRecipe();
   const { setThreadId } = useCopilotContext();
 
@@ -67,12 +70,44 @@ export default function Home() {
   const recipe = recipeContext?.recipe;
   const error = upload.error?.message || null;
 
-  if (!recipe) {
+  if (!recipe && isSingleColumn) {
     return (
       <UploadScreen
         onFileSelect={handleFileSelect}
         isUploading={upload.isPending}
         error={error}
+      />
+    );
+  }
+
+  if (!recipe) {
+    return (
+      <DesktopLayout
+        recipe={null}
+        currentStep={0}
+        threadId={threadId}
+        onNextStep={handleNextStep}
+        uploadState={{
+          onFileSelect: handleFileSelect,
+          isUploading: upload.isPending,
+          error,
+        }}
+      />
+    );
+  }
+
+  if (!isSingleColumn) {
+    return (
+      <DesktopLayout
+        recipe={recipe}
+        currentStep={recipeContext?.current_step ?? 0}
+        threadId={threadId}
+        onNextStep={handleNextStep}
+        uploadState={{
+          onFileSelect: handleFileSelect,
+          isUploading: upload.isPending,
+          error,
+        }}
       />
     );
   }

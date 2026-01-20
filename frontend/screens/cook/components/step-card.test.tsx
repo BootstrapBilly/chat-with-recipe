@@ -44,7 +44,7 @@ describe("StepCard", () => {
 
   it("applies active styles when isActive", () => {
     const { container } = render(
-      <StepCard step={baseStep} isActive={true} isComplete={false} />
+      <StepCard step={baseStep} isActive={true} isComplete={false} />,
     );
 
     const card = container.firstChild as HTMLElement;
@@ -53,7 +53,7 @@ describe("StepCard", () => {
 
   it("applies complete styles when isComplete", () => {
     const { container } = render(
-      <StepCard step={baseStep} isActive={false} isComplete={true} />
+      <StepCard step={baseStep} isActive={false} isComplete={true} />,
     );
 
     const card = container.firstChild as HTMLElement;

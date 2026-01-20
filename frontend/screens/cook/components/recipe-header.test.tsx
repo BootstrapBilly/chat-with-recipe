@@ -1,44 +1,37 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { Header } from "./header";
+import { RecipeHeader } from "./recipe-header";
 import { baseRecipe } from "@/fixtures/recipe";
 
-describe("Header", () => {
-  it("renders recipe title", () => {
-    render(<Header recipe={baseRecipe} currentStep={0} totalSteps={5} />);
+describe("RecipeHeader", () => {
+  it("renders mobile header content", () => {
+    render(<RecipeHeader recipe={baseRecipe} variant="mobile" />);
 
     expect(screen.getByText("Test Recipe")).toBeInTheDocument();
-  });
-
-  it("renders prep time", () => {
-    render(<Header recipe={baseRecipe} currentStep={0} totalSteps={5} />);
-
     expect(screen.getByText("15m prep")).toBeInTheDocument();
-  });
-
-  it("renders cook time", () => {
-    render(<Header recipe={baseRecipe} currentStep={0} totalSteps={5} />);
-
     expect(screen.getByText("30m cook")).toBeInTheDocument();
+    expect(screen.getByText("medium")).toBeInTheDocument();
   });
 
-  it("renders difficulty", () => {
-    render(<Header recipe={baseRecipe} currentStep={0} totalSteps={5} />);
+  it("renders desktop header content", () => {
+    render(<RecipeHeader recipe={baseRecipe} variant="desktop" />);
 
-    expect(screen.getByText("medium")).toBeInTheDocument();
+    expect(screen.getByText("Test Recipe")).toBeInTheDocument();
+    expect(
+      screen.getByText("15m prep • 30m cook • medium"),
+    ).toBeInTheDocument();
   });
 
   it("renders Unknown fallbacks", () => {
     render(
-      <Header
+      <RecipeHeader
+        variant="mobile"
         recipe={{
           ...baseRecipe,
           prep_time_minutes: null,
           cook_time_minutes: null,
-          difficulty: null as never,
+          difficulty: undefined as unknown as typeof baseRecipe.difficulty,
         }}
-        currentStep={0}
-        totalSteps={5}
       />,
     );
 

@@ -9,10 +9,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/generated/sheet";
-import { Header } from "./header";
+import { RecipeHeader } from "../components/recipe-header";
 import { Ingredients } from "./ingredients";
-import { ScaleServings } from "./scale-servings";
-import { StepCard } from "./step-card";
+import { ScaleServings } from "../components/scale-servings";
+import { StepCard } from "../components/step-card";
 import type { Recipe } from "@/types/recipe";
 
 interface Props {
@@ -33,11 +33,7 @@ export function MobileLayout({
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      <Header
-        recipe={recipe}
-        currentStep={currentStep}
-        totalSteps={totalSteps}
-      />
+      <RecipeHeader recipe={recipe} variant="mobile" />
 
       {/* Steps */}
       <main className="flex-1 overflow-auto">
