@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Info, ListChecks } from "lucide-react";
 import { useCopilotChat } from "@copilotkit/react-core";
 import { MessageRole, TextMessage } from "@copilotkit/runtime-client-gql";
@@ -51,6 +51,16 @@ export function Ingredients({ ingredients }: IngredientsProps) {
   const [swapValue, setSwapValue] = useState("");
   const [swapError, setSwapError] = useState<string | null>(null);
   const [isSwapping, setIsSwapping] = useState(false);
+  const isLoadingRef = useRef(isLoading);
+  const isDialogOpenRef = useRef(isDialogOpen);
+
+  useEffect(() => {
+    isLoadingRef.current = isLoading;
+  }, [isLoading]);
+
+  useEffect(() => {
+    isDialogOpenRef.current = isDialogOpen;
+  }, [isDialogOpen]);
 
   const groupedIngredients = CATEGORY_ORDER.reduce(
     (acc, category) => {
@@ -67,12 +77,12 @@ export function Ingredients({ ingredients }: IngredientsProps) {
     setIsDialogOpen(true);
   }
 
-  useEffect(() => {
-    if (isSwapping && !isLoading) {
-      setIsSwapping(false);
-      setIsDialogOpen(false);
+  async function waitForSwapCompletion() {
+    const startedAt = Date.now();
+    while (isLoadingRef.current && Date.now() - startedAt < 15000) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
     }
-  }, [isLoading, isSwapping]);
+  }
 
   async function handleSubstitute(ingredient: Ingredient, substitute: string) {
     const content = substitute
@@ -88,6 +98,11 @@ export function Ingredients({ ingredients }: IngredientsProps) {
           content,
         }),
       );
+      await waitForSwapCompletion();
+      if (isDialogOpenRef.current) {
+        setIsDialogOpen(false);
+      }
+      setIsSwapping(false);
     } catch (error) {
       setIsSwapping(false);
       setSwapError(

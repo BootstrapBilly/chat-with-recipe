@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageCircle, ChevronRight, Users } from "lucide-react";
+import { MessageCircle, ChevronRight } from "lucide-react";
 import { CopilotChat } from "@copilotkit/react-ui";
 import { Button } from "@/components/generated/button";
 import {
@@ -11,6 +11,7 @@ import {
 } from "@/components/generated/sheet";
 import { Header } from "./header";
 import { Ingredients } from "./ingredients";
+import { ScaleServings } from "./scale-servings";
 import { StepCard } from "./step-card";
 import type { Recipe } from "@/types/recipe";
 
@@ -55,10 +56,7 @@ export function MobileLayout({
       {/* Bottom Bar */}
       <div className="flex items-center justify-between p-4 border-t border-border bg-background">
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="h-12 px-3 gap-1.5">
-            <Users className="h-5 w-5" />
-            <span className="text-sm font-medium">{recipe.servings}</span>
-          </Button>
+          <ScaleServings servings={recipe.servings} />
           <Ingredients ingredients={recipe.ingredients} />
         </div>
         <Button
