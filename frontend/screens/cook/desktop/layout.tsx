@@ -8,16 +8,10 @@ import { RecipeHeader } from "../components/recipe-header";
 import { useRecipe } from "@/hooks/use-recipe";
 
 export function DesktopLayout() {
-  const { recipe, threadId, onFileSelect, isUploading, error } = useRecipe();
+  const { recipe, threadId } = useRecipe();
 
   if (!recipe) {
-    return (
-      <UploadScreen
-        onFileSelect={onFileSelect}
-        isUploading={isUploading}
-        error={error}
-      />
-    );
+    return <UploadScreen />;
   }
 
   return (

@@ -18,17 +18,15 @@ function mockRecipeState(
 ) {
   useRecipeMock.mockReturnValue({
     recipeContext: null,
+    setRecipeContext: vi.fn(),
     recipe: recipeWithSteps,
     currentStep: 0,
     totalSteps: recipeWithSteps.steps.length,
     isComplete: false,
-    threadId: null,
+    threadId: undefined,
     onNextStep,
-    onFileSelect: vi.fn(),
-    isUploading: false,
-    error: null,
     ...overrides,
-  });
+  } as ReturnType<typeof useRecipe>);
 }
 
 vi.mock("@copilotkit/react-ui", () => ({

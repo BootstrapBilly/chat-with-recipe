@@ -12,6 +12,14 @@ vi.mock("@/hooks/use-recipe", () => ({
   useRecipe: vi.fn(),
 }));
 
+vi.mock("@/hooks/use-upload-recipe", () => ({
+  useUploadRecipe: () => ({
+    mutate: vi.fn(),
+    isPending: false,
+    error: null,
+  }),
+}));
+
 const useRecipeMock = vi.mocked(useRecipe);
 
 function mockRecipeState(overrides?: Partial<ReturnType<typeof useRecipe>>) {
@@ -22,11 +30,9 @@ function mockRecipeState(overrides?: Partial<ReturnType<typeof useRecipe>>) {
     isComplete: false,
     threadId: "thread-1",
     onNextStep: vi.fn(),
-    onFileSelect: vi.fn(),
-    isUploading: false,
-    error: null,
+    setRecipeContext: vi.fn(),
     ...overrides,
-  } as never);
+  } as unknown as ReturnType<typeof useRecipe>);
 }
 
 describe("DesktopLayout", () => {

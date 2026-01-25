@@ -17,25 +17,10 @@ import { UploadScreen } from "@/screens/upload-screen/upload-screen";
 import { useRecipe } from "@/hooks/use-recipe";
 
 export function MobileLayout() {
-  const {
-    recipe,
-    currentStep,
-    isComplete,
-    threadId,
-    onNextStep,
-    onFileSelect,
-    isUploading,
-    error,
-  } = useRecipe();
+  const { recipe, currentStep, isComplete, threadId, onNextStep } = useRecipe();
 
   if (!recipe) {
-    return (
-      <UploadScreen
-        onFileSelect={onFileSelect}
-        isUploading={isUploading}
-        error={error}
-      />
-    );
+    return <UploadScreen />;
   }
 
   return (
