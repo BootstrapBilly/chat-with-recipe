@@ -6,8 +6,7 @@ import { StepCard } from "../components/step-card";
 import { useRecipe } from "@/hooks/use-recipe";
 
 export function StepsPanel() {
-  const { recipe, currentStep, totalSteps, isComplete, onNextStep } =
-    useRecipe();
+  const { recipe, currentStep, totalSteps, isComplete, moveToNextStep } = useRecipe();
 
   if (!recipe) return null;
 
@@ -28,7 +27,7 @@ export function StepsPanel() {
         ))}
       </div>
       <div className="p-4 border-t border-border">
-        <Button onClick={onNextStep} disabled={isComplete} className="w-full">
+        <Button onClick={moveToNextStep} disabled={isComplete} className="w-full">
           {isComplete ? "Finished" : "Next"}
           {!isComplete && <ChevronRight className="ml-1 h-5 w-5" />}
         </Button>

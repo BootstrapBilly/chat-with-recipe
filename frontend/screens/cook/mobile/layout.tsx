@@ -17,7 +17,7 @@ import { UploadScreen } from "@/screens/upload-screen/upload-screen";
 import { useRecipe } from "@/hooks/use-recipe";
 
 export function MobileLayout() {
-  const { recipe, currentStep, isComplete, threadId, onNextStep } = useRecipe();
+  const { recipe, currentStep, isComplete, threadId, moveToNextStep } = useRecipe();
 
   if (!recipe) {
     return <UploadScreen />;
@@ -48,7 +48,7 @@ export function MobileLayout() {
           <Ingredients />
         </div>
         <Button
-          onClick={onNextStep}
+          onClick={moveToNextStep}
           disabled={isComplete}
           className="h-12 px-8"
         >

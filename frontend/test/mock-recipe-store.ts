@@ -1,18 +1,22 @@
 import { vi } from "vitest";
-import type { useRecipe } from "@/hooks/use-recipe";
+import type { RecipeStore } from "@/hooks/use-recipe";
 
-export function makeRecipeStore(
-  overrides: Partial<ReturnType<typeof useRecipe>> = {},
-): ReturnType<typeof useRecipe> {
+export function makeRecipeStore(overrides: Partial<RecipeStore> = {}): RecipeStore {
+  const recipeContext = overrides.recipeContext ?? undefined;
+  const recipe = overrides.recipe ?? recipeContext?.recipe ?? null;
+  const totalSteps = overrides.totalSteps ?? recipe?.steps?.length ?? 0;
+  const currentStep = overrides.currentStep ?? recipeContext?.current_step ?? 1;
+  const isComplete = overrides.isComplete ?? (recipe ? currentStep > totalSteps : false);
+
   return {
-    recipeContext: null,
+    recipeContext,
     setRecipeContext: vi.fn(),
-    recipe: null,
-    currentStep: 0,
-    totalSteps: 0,
-    isComplete: false,
     threadId: undefined,
-    onNextStep: vi.fn(),
+    recipe,
+    currentStep,
+    totalSteps,
+    isComplete,
+    moveToNextStep: vi.fn(),
     ...overrides,
   };
 }

@@ -55,7 +55,7 @@ describe("UploadScreen", () => {
     await user.upload(input, file);
 
     expect(mutate).toHaveBeenCalled();
-    expect(setRecipeContext).toHaveBeenCalledWith(mockState);
+    expect(setRecipeContext).toHaveBeenCalledWith({ ...mockState, current_step: 1 });
   });
 
   it("shows error on upload failure", async () => {

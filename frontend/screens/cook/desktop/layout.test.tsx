@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { DesktopLayout } from "./layout";
 import { baseRecipe } from "@/fixtures/recipe";
 import { useRecipe } from "@/hooks/use-recipe";
+import type { RecipeContext } from "@/types/recipe";
 
 vi.mock("@copilotkit/react-ui", () => ({
   CopilotChat: () => <div data-testid="copilot-chat">Chat</div>,
@@ -22,16 +23,23 @@ vi.mock("@/hooks/use-upload-recipe", () => ({
 
 const useRecipeMock = vi.mocked(useRecipe);
 
-function mockRecipeState(overrides?: Partial<ReturnType<typeof useRecipe>>) {
+function mockRecipeContext(recipe: RecipeContext["recipe"]) {
   useRecipeMock.mockReturnValue({
-    recipe: baseRecipe,
-    currentStep: 0,
-    totalSteps: baseRecipe.steps.length,
-    isComplete: false,
-    threadId: "thread-1",
-    onNextStep: vi.fn(),
+    recipeContext: recipe ? {
+      document_text: null,
+      recipe,
+      current_step: 1,
+      scaled_servings: null,
+      checked_ingredients: [],
+      cooking_started: false,
+    } : undefined,
     setRecipeContext: vi.fn(),
-    ...overrides,
+    threadId: "thread-1",
+    recipe,
+    currentStep: 1,
+    totalSteps: recipe?.steps?.length ?? 0,
+    isComplete: false,
+    moveToNextStep: vi.fn(),
   } as unknown as ReturnType<typeof useRecipe>);
 }
 
@@ -41,7 +49,7 @@ describe("DesktopLayout", () => {
   });
 
   it("renders upload screen when no recipe", () => {
-    mockRecipeState({ recipe: null });
+    mockRecipeContext(null);
     render(<DesktopLayout />);
 
     expect(
@@ -50,7 +58,7 @@ describe("DesktopLayout", () => {
   });
 
   it("renders ingredients, chat, and steps when recipe is present", () => {
-    mockRecipeState({ recipe: baseRecipe });
+    mockRecipeContext(baseRecipe);
     render(<DesktopLayout />);
 
     expect(screen.getByText("Ingredients")).toBeInTheDocument();

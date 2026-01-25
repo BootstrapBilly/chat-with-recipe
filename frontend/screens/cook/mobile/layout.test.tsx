@@ -5,7 +5,7 @@ import { MobileLayout } from "./layout";
 import { recipeWithSteps } from "@/fixtures/recipe";
 import { useRecipe } from "@/hooks/use-recipe";
 
-const onNextStep = vi.fn();
+const moveToNextStep = vi.fn();
 
 vi.mock("@/hooks/use-recipe", () => ({
   useRecipe: vi.fn(),
@@ -24,7 +24,7 @@ function mockRecipeState(
     totalSteps: recipeWithSteps.steps.length,
     isComplete: false,
     threadId: undefined,
-    onNextStep,
+    moveToNextStep,
     ...overrides,
   } as ReturnType<typeof useRecipe>);
 }
@@ -69,14 +69,14 @@ describe("MobileLayout", () => {
     ).toBeInTheDocument();
   });
 
-  it("calls onNextStep when button is clicked", async () => {
-    onNextStep.mockClear();
+  it("calls moveToNextStep when button is clicked", async () => {
+    moveToNextStep.mockClear();
     mockRecipeState({ currentStep: 1, isComplete: false });
     render(<MobileLayout />);
 
     await userEvent.click(screen.getByRole("button", { name: /next/i }));
 
-    expect(onNextStep).toHaveBeenCalledOnce();
+    expect(moveToNextStep).toHaveBeenCalledOnce();
   });
 
   it("renders servings in bottom bar", () => {
