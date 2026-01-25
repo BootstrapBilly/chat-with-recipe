@@ -37,7 +37,7 @@ export function DesktopLayout() {
       <IngredientsPanel />
 
       <div className="flex h-full flex-col min-h-0">
-        <RecipeHeader recipe={recipe} variant="desktop" />
+        <RecipeHeader recipe={recipe} />
 
         <div className="flex-1 min-h-0 overflow-hidden">
           <CopilotChat

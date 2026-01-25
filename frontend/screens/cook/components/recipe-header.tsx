@@ -5,10 +5,9 @@ import type { Recipe } from "@/types/recipe";
 
 interface RecipeHeaderProps {
   recipe: Recipe;
-  variant: "mobile" | "desktop";
 }
 
-export function RecipeHeader({ recipe, variant }: RecipeHeaderProps) {
+export function RecipeHeader({ recipe }: RecipeHeaderProps) {
   const prepTime = recipe.prep_time_minutes
     ? `${recipe.prep_time_minutes}m prep`
     : "Unknown prep";
@@ -16,17 +15,6 @@ export function RecipeHeader({ recipe, variant }: RecipeHeaderProps) {
     ? `${recipe.cook_time_minutes}m cook`
     : "Unknown cook";
   const difficulty = recipe.difficulty ?? "Unknown";
-
-  if (variant === "desktop") {
-    return (
-      <header className="border-b border-border px-6 py-5">
-        <h1 className="text-xl font-semibold">{recipe.title}</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          {prepTime} • {cookTime} • {difficulty}
-        </p>
-      </header>
-    );
-  }
 
   return (
     <header className="px-4 py-4 border-b border-border">

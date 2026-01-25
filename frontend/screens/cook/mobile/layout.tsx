@@ -40,7 +40,7 @@ export function MobileLayout() {
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      <RecipeHeader recipe={recipe} variant="mobile" />
+      <RecipeHeader recipe={recipe} />
 
       {/* Steps */}
       <main className="flex-1 overflow-auto">
