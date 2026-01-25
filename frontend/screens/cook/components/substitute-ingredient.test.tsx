@@ -1,9 +1,15 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { beforeEach, describe, it, expect, vi } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import React from "react";
 import { SubstituteIngredient } from "./substitute-ingredient";
 import type { Ingredient } from "@/types/recipe";
+
+const appendMessage = vi.fn();
+const useCopilotChatMock = vi.fn();
+
+vi.mock("@copilotkit/react-core", () => ({
+  useCopilotChat: (...args: unknown[]) => useCopilotChatMock(...args),
+}));
 
 const ingredient: Ingredient = {
   name: "Tomatoes",
@@ -15,15 +21,19 @@ const ingredient: Ingredient = {
 };
 
 describe("SubstituteIngredient", () => {
+  beforeEach(() => {
+    appendMessage.mockReset();
+    useCopilotChatMock.mockReturnValue({
+      appendMessage,
+      isLoading: false,
+    });
+  });
+
   it("renders swap source details", () => {
     render(
       <SubstituteIngredient
         ingredient={ingredient}
-        open
-        onOpenChange={() => {}}
-        onSubmit={() => {}}
-        value=""
-        onValueChange={() => {}}
+        onClose={() => {}}
       />,
     );
 
@@ -33,22 +43,15 @@ describe("SubstituteIngredient", () => {
 
   it("calls onSubmit with trimmed input", async () => {
     const user = userEvent.setup();
-    const onSubmit = vi.fn();
-    const Wrapper = () => {
-      const [value, setValue] = React.useState("");
-      return (
-        <SubstituteIngredient
-          ingredient={ingredient}
-          open
-          onOpenChange={() => {}}
-          onSubmit={onSubmit}
-          value={value}
-          onValueChange={setValue}
-        />
-      );
-    };
+    appendMessage.mockResolvedValue(undefined);
+    const onClose = vi.fn();
 
-    render(<Wrapper />);
+    render(
+      <SubstituteIngredient
+        ingredient={ingredient}
+        onClose={onClose}
+      />,
+    );
 
     await user.type(
       screen.getByPlaceholderText(/leave blank/i),
@@ -56,38 +59,50 @@ describe("SubstituteIngredient", () => {
     );
     await user.click(screen.getByRole("button", { name: /substitute/i }));
 
-    expect(onSubmit).toHaveBeenCalledWith(ingredient, "roasted peppers");
+    await waitFor(() => {
+      expect(appendMessage).toHaveBeenCalledTimes(1);
+    });
+    const message = appendMessage.mock.calls[0]?.[0] as { content?: string };
+    expect(message?.content).toBe(
+      "Substitute Tomatoes with roasted peppers.",
+    );
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
   });
 
   it("shows loading state", () => {
+    useCopilotChatMock.mockReturnValue({
+      appendMessage,
+      isLoading: true,
+    });
+
     render(
       <SubstituteIngredient
         ingredient={ingredient}
-        open
-        onOpenChange={() => {}}
-        onSubmit={() => {}}
-        value=""
-        onValueChange={() => {}}
-        isLoading
+        onClose={() => {}}
       />,
     );
 
     expect(screen.getByRole("button", { name: /swapping/i })).toBeDisabled();
   });
 
-  it("shows error message", () => {
+  it("does not close on submit error", async () => {
+    const user = userEvent.setup();
+    appendMessage.mockRejectedValue(new Error("Swap failed"));
+    const onClose = vi.fn();
+
     render(
       <SubstituteIngredient
         ingredient={ingredient}
-        open
-        onOpenChange={() => {}}
-        onSubmit={() => {}}
-        value=""
-        onValueChange={() => {}}
-        error="Swap failed"
+        onClose={onClose}
       />,
     );
 
-    expect(screen.getByText("Swap failed")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /substitute/i }));
+    await waitFor(() => {
+      expect(appendMessage).toHaveBeenCalledTimes(1);
+    });
+    expect(onClose).not.toHaveBeenCalled();
   });
 });

@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useCopilotChat } from "@copilotkit/react-core";
-import { MessageRole, TextMessage } from "@copilotkit/runtime-client-gql";
+import { useState } from "react";
 import { IngredientItem } from "./ingredient-item";
 import { SubstituteIngredient } from "./substitute-ingredient";
 import {
@@ -15,64 +13,15 @@ import { useRecipe } from "@/hooks/use-recipe";
 export function IngredientsList() {
   const { recipe } = useRecipe();
   const ingredients = recipe?.ingredients ?? [];
-  const { appendMessage, isLoading } = useCopilotChat();
   const [selectedIngredient, setSelectedIngredient] =
     useState<Ingredient | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [swapValue, setSwapValue] = useState("");
-  const [swapError, setSwapError] = useState<string | null>(null);
-  const [isSwapping, setIsSwapping] = useState(false);
-  const isLoadingRef = useRef(isLoading);
-  const isDialogOpenRef = useRef(isDialogOpen);
-
-  useEffect(() => {
-    isLoadingRef.current = isLoading;
-  }, [isLoading]);
-
-  useEffect(() => {
-    isDialogOpenRef.current = isDialogOpen;
-  }, [isDialogOpen]);
 
   const groupedIngredients = groupIngredientsByCategory(ingredients);
 
   function handleIngredientClick(ingredient: Ingredient) {
-    setSwapValue("");
     setSelectedIngredient(ingredient);
     setIsDialogOpen(true);
-  }
-
-  async function waitForSwapCompletion() {
-    const startedAt = Date.now();
-    while (isLoadingRef.current && Date.now() - startedAt < 15000) {
-      await new Promise((resolve) => setTimeout(resolve, 50));
-    }
-  }
-
-  async function handleSubstitute(ingredient: Ingredient, substitute: string) {
-    const content = substitute
-      ? `Substitute ${ingredient.name} with ${substitute}.`
-      : `Suggest a substitute for ${ingredient.name}.`;
-
-    setSwapError(null);
-    setIsSwapping(true);
-    try {
-      await appendMessage(
-        new TextMessage({
-          role: MessageRole.User,
-          content,
-        }),
-      );
-      await waitForSwapCompletion();
-      if (isDialogOpenRef.current) {
-        setIsDialogOpen(false);
-      }
-      setIsSwapping(false);
-    } catch (error) {
-      setIsSwapping(false);
-      setSwapError(
-        error instanceof Error ? error.message : "Something went wrong",
-      );
-    }
   }
 
   return (
@@ -99,16 +48,12 @@ export function IngredientsList() {
         ))}
       </div>
 
-      <SubstituteIngredient
-        ingredient={selectedIngredient}
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        onSubmit={handleSubstitute}
-        value={swapValue}
-        onValueChange={setSwapValue}
-        isLoading={isSwapping || isLoading}
-        error={swapError}
-      />
+      {isDialogOpen && selectedIngredient && (
+        <SubstituteIngredient
+          ingredient={selectedIngredient}
+          onClose={() => setIsDialogOpen(false)}
+        />
+      )}
     </>
   );
 }

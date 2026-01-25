@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { useCopilotChat } from "@copilotkit/react-core";
+import { MessageRole, TextMessage } from "@copilotkit/runtime-client-gql";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/generated/button";
 import {
@@ -14,34 +17,47 @@ import type { Ingredient } from "@/types/recipe";
 
 interface SubstituteIngredientProps {
   ingredient: Ingredient | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSubmit: (ingredient: Ingredient, substitute: string) => void;
-  value: string;
-  onValueChange: (value: string) => void;
-  isLoading?: boolean;
-  error?: string | null;
+  onClose: () => void;
 }
 
 export function SubstituteIngredient({
   ingredient,
-  open,
-  onOpenChange,
-  onSubmit,
-  value,
-  onValueChange,
-  isLoading = false,
-  error = null,
+  onClose,
 }: SubstituteIngredientProps) {
+  const { appendMessage, isLoading } = useCopilotChat({
+    id: "ingredients-swap",
+  });
+  const [value, setValue] = useState("");
+
   if (!ingredient) return null;
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!ingredient) return;
-    onSubmit(ingredient, value.trim());
+    const substitute = value.trim();
+    const content = substitute
+      ? `Substitute ${ingredient.name} with ${substitute}.`
+      : `Suggest a substitute for ${ingredient.name}.`;
+
+    try {
+      await appendMessage(
+        new TextMessage({
+          role: MessageRole.User,
+          content,
+        }),
+      );
+      onClose();
+    } catch {
+      // CopilotKit shows a toast for async errors; keep the dialog open.
+    }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) onClose();
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Substitute ingredient</DialogTitle>
@@ -60,9 +76,8 @@ export function SubstituteIngredient({
           <Input
             placeholder="Leave blank to let the assistant decide"
             value={value}
-            onChange={(event) => onValueChange(event.target.value)}
+            onChange={(event) => setValue(event.target.value)}
           />
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
           <Button
             onClick={handleSubmit}
             className="w-full"
