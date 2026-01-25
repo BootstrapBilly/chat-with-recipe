@@ -72,22 +72,6 @@ Implementation sketch:
 - Backend: use `update_cooking_progress` to set explicit step indices (including decrease/reset).
 - Frontend: add back/reset controls and update the UI based on the new current step.
 
-## Deterministic step + scale actions
-
-Behaviour:
-
-- Step progression and scaling should be deterministic (UI-driven), not dependent on the LLM deciding whether to call tools.
-- The backend should still receive the updates so it stays in sync with the UI.
-
-Implementation sketch:
-
-- Steps: keep `current_step` updated via explicit state sync or direct tool call, but the UI drives the step index (no LLM inference).
-- Scaling: call `scale_recipe` with a concrete `target_servings` from the UI; avoid free-form natural language for scaling intent.
-
-Notes:
-
-- Scaling already looks deterministic in the backend via `scale_recipe`; the improvement is to ensure the UI always invokes it directly through a dedicated endpoint.
-
 ## Playwright smoke test
 
 Behaviour:

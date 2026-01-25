@@ -20,7 +20,7 @@ export function UploadScreen() {
       upload.mutate(file, {
         onSuccess: (data) => {
           setUploadError(null);
-          setRecipeContext(data.state);
+          setRecipeContext({ ...data.state, current_step: 1 });
         },
         onError: () => {
           setUploadError("We could not upload that document.");
@@ -37,9 +37,14 @@ export function UploadScreen() {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <h1 className="text-title">Recipe Companion</h1>
-          <p className="text-muted-foreground">Upload a recipe to get started</p>
+          <p className="text-muted-foreground">
+            Upload a recipe to get started
+          </p>
         </div>
-        <FileUpload onFileSelect={handleFileSelect} isUploading={upload.isPending} />
+        <FileUpload
+          onFileSelect={handleFileSelect}
+          isUploading={upload.isPending}
+        />
         {error ? (
           <Alert className="border-destructive/30 bg-destructive/10 text-destructive">
             <AlertTitle>Upload failed</AlertTitle>

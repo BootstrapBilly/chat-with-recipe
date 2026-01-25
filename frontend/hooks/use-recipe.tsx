@@ -1,8 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useMemo } from "react";
-import { useCoAgent, useCopilotChatInternal } from "@copilotkit/react-core";
-import { randomUUID } from "@copilotkit/shared";
+import { useCoAgent, useCopilotChat } from "@copilotkit/react-core";
 import type { Recipe, RecipeContext } from "@/types/recipe";
 
 interface RecipeStore {
@@ -19,7 +18,7 @@ interface RecipeStore {
 const RecipeContextValue = createContext<RecipeStore | null>(null);
 
 export function RecipeProvider({ children }: { children: React.ReactNode }) {
-  const { sendMessage } = useCopilotChatInternal();
+  useCopilotChat(); // This has a sideeffect to connect the agent to the backend
 
   const {
     state: recipeContext,
@@ -27,21 +26,19 @@ export function RecipeProvider({ children }: { children: React.ReactNode }) {
     threadId,
   } = useCoAgent<RecipeContext>({
     name: "recipe_agent",
-  });
-
-  const handleNextStep = useCallback(async () => {
-    if (!recipeContext?.recipe) return;
-    await sendMessage({
-      id: randomUUID(),
-      role: "user",
-      content: "Move on to the next step",
-    });
-  }, [recipeContext, sendMessage]);
+  }); // this is what we use for 2 way binding state, but it doesn't connect itself?? That's why we have the hook above, to init the connection
 
   const recipe = recipeContext?.recipe ?? null;
   const totalSteps = recipe?.steps.length ?? 0;
-  const currentStep = (recipeContext?.current_step ?? 0) + 1;
+  const currentStep = recipeContext?.current_step;
   const isComplete = recipe ? currentStep >= totalSteps : false;
+
+  const handleNextStep = useCallback(async () => {
+    if (!recipeContext?.recipe) return;
+    if (!isComplete) {
+      setRecipeContext({ ...recipeContext, current_step: currentStep + 1 });
+    }
+  }, [recipeContext, isComplete, setRecipeContext, currentStep]);
 
   const value = useMemo<RecipeStore>(
     () => ({
