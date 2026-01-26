@@ -16,6 +16,7 @@ export type IngredientCategory =
 export interface Ingredient {
   name: string;
   quantity: number | null;
+  original_quantity?: number | null;
   unit: string | null;
   preparation: string | null;
   category: IngredientCategory;

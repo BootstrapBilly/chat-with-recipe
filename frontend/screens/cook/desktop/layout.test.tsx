@@ -40,6 +40,7 @@ function mockRecipeContext(recipe: RecipeContext["recipe"]) {
     totalSteps: recipe?.steps?.length ?? 0,
     isComplete: false,
     moveToNextStep: vi.fn(),
+    scaleServings: vi.fn(),
   } as unknown as ReturnType<typeof useRecipe>);
 }
 

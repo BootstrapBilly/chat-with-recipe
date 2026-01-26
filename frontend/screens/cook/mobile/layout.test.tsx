@@ -25,6 +25,7 @@ function mockRecipeState(
     isComplete: false,
     threadId: undefined,
     moveToNextStep,
+    scaleServings: vi.fn(),
     ...overrides,
   } as ReturnType<typeof useRecipe>);
 }
@@ -83,7 +84,7 @@ describe("MobileLayout", () => {
     mockRecipeState();
     render(<MobileLayout />);
 
-    expect(screen.getByText("4")).toBeInTheDocument();
+    expect(screen.getByRole("spinbutton")).toHaveValue(4);
   });
 
   it("opens ingredients drawer when ingredients button is clicked", async () => {

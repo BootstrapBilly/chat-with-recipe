@@ -44,7 +44,7 @@ export function MobileLayout() {
       {/* Bottom Bar */}
       <div className="flex items-center justify-between p-4 border-t border-border bg-background">
         <div className="flex items-center gap-2">
-          <ScaleServings />
+          <ScaleServings key={recipe.servings} />
           <Ingredients />
         </div>
         <Button

@@ -2,126 +2,85 @@
 
 import { useState } from "react";
 import { Minus, Plus, Users } from "lucide-react";
-import { useCopilotChat } from "@copilotkit/react-core";
-import { MessageRole, TextMessage } from "@copilotkit/runtime-client-gql";
 import { Button } from "@/components/generated/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/generated/dialog";
 import { Input } from "@/components/generated/input";
 import { useRecipe } from "@/hooks/use-recipe";
 
 export function ScaleServings() {
-  const { recipe } = useRecipe();
-  const { appendMessage, isLoading } = useCopilotChat();
+  const { recipe, scaleServings } = useRecipe();
   const servings = recipe?.servings ?? 0;
-  const [open, setOpen] = useState(false);
   const [value, setValue] = useState(String(servings));
-
-  const parsedValue = Number.parseInt(value, 10);
-  const currentValue = Number.isFinite(parsedValue) ? parsedValue : servings;
-
-  function handleOpenChange(nextOpen: boolean) {
-    setOpen(nextOpen);
-    if (nextOpen) {
-      setValue(String(servings));
-    }
-  }
-
-  function handleDecrement() {
-    setValue(String(Math.max(1, currentValue - 1)));
-  }
-
-  function handleIncrement() {
-    setValue(String(Math.max(1, currentValue + 1)));
-  }
-
-  async function handleSubmit() {
-    if (!recipe) return;
-    const nextServings = Math.max(1, currentValue);
-    if (nextServings === servings) {
-      setOpen(false);
-      return;
-    }
-
-    await appendMessage(
-      new TextMessage({
-        role: MessageRole.User,
-        content: `Scale the recipe to ${nextServings} servings.`,
-      }),
-    );
-    setOpen(false);
-  }
 
   if (!recipe) return null;
 
+  const handleDecrement = () => {
+    const next = Math.max(1, servings - 1);
+    if (next === servings) return;
+    setValue(String(next));
+    scaleServings(next);
+  };
+
+  const handleIncrement = () => {
+    const next = Math.max(1, servings + 1);
+    setValue(String(next));
+    scaleServings(next);
+  };
+
+  const handleChange = (input: HTMLInputElement) => {
+    setValue(input.value);
+    const parsedValue = Number.parseInt(input.value, 10);
+    if (Number.isFinite(parsedValue)) {
+      scaleServings(Math.max(1, parsedValue));
+    }
+  };
+
+  const handleBlur = () => {
+    if (!value.trim()) {
+      setValue(String(servings));
+    }
+  };
+
   return (
-    <>
-      <Button
-        variant="outline"
-        className="h-12 px-3 gap-1.5"
-        onClick={() => handleOpenChange(true)}
-        disabled={!servings}
-      >
-        <Users className="h-5 w-5" />
-        <span className="text-sm font-medium">{servings}</span>
-      </Button>
-
-      <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Adjust servings</DialogTitle>
-            <DialogDescription>
-              How many people are you cooking for?
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={handleDecrement}
-                disabled={isLoading || currentValue <= 1}
-                aria-label="Decrease servings"
-              >
-                <Minus className="h-4 w-4" />
-              </Button>
-              <Input
-                type="number"
-                min={1}
-                value={value}
-                onChange={(event) => setValue(event.target.value)}
-                className="text-center"
-                inputMode="numeric"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={handleIncrement}
-                disabled={isLoading}
-                aria-label="Increase servings"
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <Button
-              className="w-full"
-              onClick={handleSubmit}
-              disabled={isLoading || currentValue < 1}
-            >
-              {isLoading ? "Scaling..." : "Update servings"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+        <Users className="h-4 w-4 text-muted-foreground" />
+        <span>Servings</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={handleDecrement}
+          disabled={servings <= 1}
+          aria-label="Decrease servings"
+        >
+          <Minus className="h-4 w-4" />
+        </Button>
+        <Input
+          type="number"
+          min={1}
+          value={value}
+          onChange={(event) => handleChange(event.currentTarget)}
+          onBlur={handleBlur}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.currentTarget.blur();
+            }
+          }}
+          className="h-10 w-16 text-center"
+          inputMode="numeric"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={handleIncrement}
+          aria-label="Increase servings"
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
   );
 }

@@ -29,6 +29,6 @@ describe("IngredientsPanel", () => {
     expect(screen.getByText("Ingredients")).toBeInTheDocument();
     expect(screen.getByText("4 items")).toBeInTheDocument();
     expect(screen.getByText("flour")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "4" })).toBeInTheDocument();
+    expect(screen.getByRole("spinbutton")).toHaveValue(4);
   });
 });

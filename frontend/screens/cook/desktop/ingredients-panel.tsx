@@ -32,7 +32,7 @@ export function IngredientsPanel() {
       </div>
 
       <div className="border-t border-border p-4">
-        <ScaleServings />
+        <ScaleServings key={recipe?.servings ?? "no-recipe"} />
       </div>
     </div>
   );

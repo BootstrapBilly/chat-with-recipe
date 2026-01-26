@@ -17,6 +17,7 @@ export function makeRecipeStore(overrides: Partial<RecipeStore> = {}): RecipeSto
     totalSteps,
     isComplete,
     moveToNextStep: vi.fn(),
+    scaleServings: vi.fn(),
     ...overrides,
   };
 }
